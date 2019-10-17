@@ -289,6 +289,20 @@ export class CanvasAreaDraw implements AfterViewInit, OnDestroy {
     }
   }
 
+  addPoint(): void {
+    this.isDrawing = true;
+    this.renderer.setStyle(this._pencil.canvas, 'display', 'block');
+    this.renderer.setStyle(this._pencil.canvas, 'z-index', this.shapes.length + 2);
+    this.renderer.setStyle(this._baseCanvas, 'z-index', this.shapes.length + 3);
+    this.renderer.setStyle(this._baseCanvas, 'cursor', 'copy');
+
+    this._pencilSubscription = this._pencil.onCompleted().subscribe(() => {
+      this._stopPaint();
+    });
+    this._pencil.addPoint();
+    this._MousemoveListen = this.renderer.listen(this._baseCanvas, 'mousemove', this._onMovePoint.bind(this));
+  }
+
   addShape(points: Array<Array<any>> = [], emit: boolean = true): void {
     const shape: Shape = new Shape(this.renderer,
      this.element, points, this.strokeColor, this.fillColor, this.handleFillColor, this.handleStrokeColor);

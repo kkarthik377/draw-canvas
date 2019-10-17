@@ -8,6 +8,7 @@ export class Pencil {
 
   private _activePointPos: number;
   private _complete: boolean;
+  private _isAddPoint: boolean;
 
   constructor(private renderer: Renderer2,
         private parent: ElementRef,
@@ -17,6 +18,7 @@ export class Pencil {
     this.points = [];
     this._activePointPos = 0;
     this._complete = false;
+    this._isAddPoint = false;
 
     this.canvas = this.renderer.createElement('canvas');
     this.context = this.canvas.getContext('2d');
@@ -28,12 +30,13 @@ export class Pencil {
     this.points = [];
     this._activePointPos = 0;
     this._complete = false;
+    this._isAddPoint = false;
     this.renderer.setStyle(this.canvas, 'display', 'none');
     this.context.canvas.width = this.context.canvas.width;
   }
 
   onMouseup(event: any, mousePos: any): void {
-    if (!this._complete) {
+    if (!this._complete && !this._isAddPoint) {
       if (event.which === 1) {
         let dis: number,
           minDis: number = 0,
@@ -70,6 +73,14 @@ export class Pencil {
         }
       }
       this._draw();
+    } else if (this._isAddPoint) {
+      this.points = [
+        [mousePos.x - 10, mousePos.y - 10],
+        [mousePos.x + 10, mousePos.y - 10],
+        [mousePos.x + 10, mousePos.y + 10],
+        [mousePos.x - 10, mousePos.y + 10],
+      ];
+      this.completed.emit();
     }
   }
 
@@ -120,5 +131,9 @@ export class Pencil {
       this.completed.emit();
     }
     this.context.stroke();
+  }
+
+  addPoint(): void {
+    this._isAddPoint = true;
   }
 }

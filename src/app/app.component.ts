@@ -20,8 +20,8 @@ export class AppComponent {
     defaults: Array<Array<Array<number>>>;
 
     constructor() {
-        this.imageUrl = 'https://i.imgur.com/0wMJHZK.jpg';
-        this.image2Url = 'https://i.imgur.com/0wMJHZK.jpg';
+      this.imageUrl = 'https://i.imgur.com/0wMJHZK.jpg';
+      this.image2Url = 'https://i.imgur.com/0wMJHZK.jpg';
         this.strokeColor = 'rgba(255, 255, 255, 0.7)';
         this.fillColor = 'rgba(255, 255, 255, 0.2)';
         this.handleFillColor = 'rgba(255, 255, 255, 1)';
