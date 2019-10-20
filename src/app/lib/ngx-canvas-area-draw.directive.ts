@@ -43,7 +43,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   @Output()
   pathDeleted: EventEmitter<number> = new EventEmitter<number>();
   @Output()
-  updateImageSize: EventEmitter<{width: number, height: number}> = new EventEmitter<{width: number, height: number}>()
+  updateImageSize: EventEmitter<{width: number | string, height: number | string}> = new EventEmitter<{width: number | string, height: number | string}>()
 
   paths: BasePath[] = [];
   height: number;
@@ -93,11 +93,10 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     if (this._zoomScale === 1 && this._baseDiv) {
       this._baseDiv.style.left = '0px';
       this._baseDiv.style.top = '0px';
+      this.resetImageWidth();
+    } else if (this._zoomScale > 1) {
+      this.setImageWidth();
     }
-    // if (this._baseCanvas) {
-    //   this.renderer.setStyle(this._baseImage, 'style.transform', 'scale(' + this._zoomScale + ')');
-    //   this.scaleContent();
-    // }
   }
 
   // toDo: fox, 4/10/19 Receive also an image file
@@ -328,14 +327,11 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   private _updateGeometry() {
     this.height = this._baseImage.height;
     this.width = this._baseImage.width;
-    this.updateImageSize.emit({
-      width: this.width,
-      height: this.height
-    })
   }
 
   @HostListener('window:resize')
   private scaleContent() {
+    this.resetImageWidth();
     this._updateGeometry();
 
     if (this._baseCanvas) {
@@ -522,12 +518,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
       this.marginTop = this.marginTop + deltaY;
       this._baseDiv.style.left = this.marginLeft + 'px';
       this._baseDiv.style.top = this.marginTop + 'px';
-      // console.table(rect);
-      // console.table(mousePos);
-      // console.log('marginLeft' + this.marginLeft);
-      // console.log('marginTop' + this.marginTop);
     }
-    // console.log(this.isDraggable);
     return false;
   }
 
@@ -548,6 +539,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this.width = null;
     this._activePathPosition = null;
     this.isDraggable = false;
+    this.resetImageWidth();
   }
 
   private _createBaseImage() {
@@ -652,6 +644,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   private _onMouseleave(): boolean {
     this._setActivePathPosition(null);
     this.isDraggable = false;
+    this.resetImageWidth();
     if (!this.isDrawing) {
       this._MousemoveListener();
       this.renderer.setStyle(
@@ -677,11 +670,13 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
             this.isDraggable = true;
             this.lastX = (event.clientX) / this._zoomScale;
             this.lastY = (event.clientY) / this._zoomScale;
+            // this.setImageWidth();
           }
         } else if (this._zoomScale > 1) {
           this.isDraggable = true;
           this.lastX = (event.clientX) / this._zoomScale;
           this.lastY = (event.clientY) / this._zoomScale;
+          // this.setImageWidth();
         }
       } else {
         this.renderer.setStyle(
@@ -697,6 +692,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   private _onMouseup(event: MouseEvent): boolean {
     if (event.button < 2) {
       this.isDraggable = false;
+      this.resetImageWidth();
       const mousePos = this._getMousePos(event);
       if (this.isDrawing) {
         this.renderer.setStyle(
@@ -865,6 +861,22 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this._MouseLeaveListener();
     this._MousemoveListener();
     this._ContextmenuListener();
+  }
+
+  private setImageWidth(): void {
+    this.updateImageSize.emit({
+      width: this.width + 'px',
+      height: this.height + 'px'
+    });
+  }
+
+  private resetImageWidth(): void {
+    if (this._zoomScale === 1) {
+      this.updateImageSize.emit({
+        width: 'auto',
+        height: 'auto'
+      });
+    }
   }
 
   private _MousedownListener(): void {

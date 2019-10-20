@@ -3,10 +3,10 @@
     <button (click)="areaDraw.startDrawing()">
       New path
     </button>
-    <button (click)="zoomScale = zoomScale + 1">
+    <button (click)="zoomScale = zoomScale === 3 ? zoomScale : zoomScale + 1">
       ZoomIn
     </button>
-    <button (click)="zoomScale = zoomScale - 1">
+    <button (click)="zoomScale = zoomScale === 1 ? zoomScale : zoomScale - 1">
       ZoomOut
     </button>
   </div>
@@ -62,9 +62,10 @@
     </div>
 
     <div
-      [style.width]="imageWidth + 'px'"
-      [style.height]="imageHeight + 'px'"
-      style="overflow: hidden; border: red solid 1px;"
+      [style.width]="imageWidth"
+      [style.height]="imageHeight"
+      [style.overflow]="imageDivOverflow"
+      style="border: red solid 1px;"
     >
       <div
         #areaDraw="canvasAreaDraw"

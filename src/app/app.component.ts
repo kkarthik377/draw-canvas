@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 
 import { GenericPath, NgxCanvasAreaDrawDirective, PathData, Rect } from 'ngx-canvas-area-draw';
 
@@ -23,10 +23,11 @@ export class AppComponent implements OnInit {
   allowDelete: boolean;
   defaults: PathData[];
   zoomScale: number = 1;
-  imageWidth: number = 500;
-  imageHeight: number = 500;
+  imageWidth: string = 'auto';
+  imageHeight: string = 'auto';
+  imageDivOverflow: string = 'unset';
 
-  constructor() {
+  constructor(private ngZone: NgZone) {
   }
 
   ngOnInit(): void {
@@ -88,7 +89,9 @@ export class AppComponent implements OnInit {
   }
 
   onImageSizeChange(event: any): void {
+    this.imageDivOverflow = (event.width === 'auto' && event.height === 'auto') ? 'unset' : 'hidden';
     this.imageWidth = event.width;
     this.imageHeight = event.height;
+    this.ngZone.run(() => {});
   }
 }
