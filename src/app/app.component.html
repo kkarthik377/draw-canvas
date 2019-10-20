@@ -1,53 +1,81 @@
 <div class="actions">
   <div class="left">
-    <button (click)="areaDraw.startPaint()">New shape</button>
-    <button (click)="areaDraw.addPoint()">New Point</button>
+    <button (click)="areaDraw.startDrawing()">
+      New path
+    </button>
   </div>
+
   <div class="right">
-    <button (click)="reset()">Reset</button>
-    <button (click)="clean()">Clean</button>
+    <button (click)="reset()">
+      Reset
+    </button>
+
+    <button (click)="clean()">
+      Clean
+    </button>
   </div>
 </div>
 
 <div class="content">
   <div class="left">
     <div class="settings">
+
       <div>
         <label>Image URL</label>
-        <input type="text" [(ngModel)]="imageUrl" (keyup)="reset()">
+        <input type="text"
+               [(ngModel)]="imageUrl"
+               (keyup)="reset()">
       </div>
+
       <div>
         <label>Update while moving</label>
-        <input type="checkbox" [(ngModel)]="updateWhileMoving">
+        <input type="checkbox"
+               [(ngModel)]="updateWhileMoving">
       </div>
+
+      <div>
+        <label>Allow delete</label>
+        <input type="checkbox"
+               [(ngModel)]="allowDelete">
+      </div>
+
       <div>
         <label>Stroke Color</label>
-        <input type="text" [(ngModel)]="strokeColor">
+        <input type="text"
+               [(ngModel)]="strokeColor">
       </div>
+
       <div>
         <label>Fill Color</label>
-        <input type="text" [(ngModel)]="fillColor">
+        <input type="text"
+               [(ngModel)]="fillColor">
       </div>
+
       <div>
-        <label>Handle Fill Color</label>
-        <input type="text" [(ngModel)]="handleFillColor">
+        <label>Handler Fill Color</label>
+        <input type="text"
+               [(ngModel)]="handlerFillColor">
       </div>
+
       <div>
-        <label>Handle Stroke Color</label>
-        <input type="text" [(ngModel)]="handleStrokeColor">
+        <label>Handler Stroke Color</label>
+        <input type="text"
+               [(ngModel)]="handlerStrokeColor">
       </div>
     </div>
 
     <div #areaDraw="canvasAreaDraw"
-         (activeShapeChangeEvent)="sceneChange($event)"
-         (addShapeEvent)="onAddShape()"
-         (removeShapeEvent)="onRemoveShape($event)"
-         [defaultShapes]="defaults"
-         [eventWhileMoving]="updateWhileMoving"
+         (activePathChange)="onSceneChange($event)"
+         (pathAdded)="onAddPath()"
+         (pathDeleted)="onRemovePath($event)"
+         [defaultPaths]="defaults"
+         [defaultActivePathIndex]="1"
+         [allowDelete]="allowDelete"
+         [notifyWhileMoving]="updateWhileMoving"
          [strokeColor]="strokeColor"
          [fillColor]="fillColor"
-         [handleFillColor]="handleFillColor"
-         [handleStrokeColor]="handleStrokeColor"
+         [handlerFillColor]="handlerFillColor"
+         [handlerStrokeColor]="handlerStrokeColor"
          [canvasAreaDraw]="imageUrl"></div>
   </div>
 
@@ -55,9 +83,8 @@
     <div #area2Draw="canvasAreaDraw"
          [strokeColor]="strokeColor"
          [fillColor]="fillColor"
-         [handleFillColor]="handleFillColor"
-         [handleStrokeColor]="handleStrokeColor"
-         [canvasAreaDraw]="image2Url">
-        </div>
+         [handlerFillColor]="handlerFillColor"
+         [handlerStrokeColor]="handlerStrokeColor"
+         [canvasAreaDraw]="image2Url"></div>
   </div>
 </div>

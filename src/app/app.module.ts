@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { CanvasAreaDraw } from './lib/ngx-canvas-area-draw.directive';
+import { NgxCanvasAreaDrawModule } from './lib/ngx-canvas-area-draw.module';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    CanvasAreaDraw
+    AppComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    NgxCanvasAreaDrawModule
   ],
   providers: [],
   bootstrap: [AppComponent]
