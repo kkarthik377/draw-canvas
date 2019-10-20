@@ -22,6 +22,9 @@ export class AppComponent implements OnInit {
   updateWhileMoving: boolean;
   allowDelete: boolean;
   defaults: PathData[];
+  zoomScale: number = 1;
+  imageWidth: number = 500;
+  imageHeight: number = 500;
 
   constructor() {
   }
@@ -39,7 +42,8 @@ export class AppComponent implements OnInit {
     this.defaults = [
       {
         name: GenericPath.NAME,
-        points: [[10, 10], [20, 10], [15, 25]]
+        points: [[10, 10], [20, 10], [15, 25]],
+        keepInsideContainer: true
       },
       {
         name: Rect.NAME,
@@ -47,7 +51,8 @@ export class AppComponent implements OnInit {
       },
       {
         name: GenericPath.NAME,
-        points: [[70, 60], [80, 60], [90, 80], [60, 80]]
+        points: [[70, 60], [80, 60], [90, 80], [60, 80]],
+        keepInsideContainer: true
       }
     ];
   }
@@ -80,5 +85,10 @@ export class AppComponent implements OnInit {
   private setImage2Url(url: string): void {
     this.image2Url = url;
     this.area2Draw.imageUrl = url;
+  }
+
+  onImageSizeChange(event: any): void {
+    this.imageWidth = event.width;
+    this.imageHeight = event.height;
   }
 }
