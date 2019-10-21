@@ -20,21 +20,23 @@ export class AppComponent {
     defaults: Array<Array<Array<number>>>;
 
     constructor() {
-      this.imageUrl = 'https://i.imgur.com/0wMJHZK.jpg';
-      this.image2Url = 'https://i.imgur.com/0wMJHZK.jpg';
-        this.strokeColor = 'rgba(255, 255, 255, 0.7)';
-        this.fillColor = 'rgba(255, 255, 255, 0.2)';
-        this.handleFillColor = 'rgba(255, 255, 255, 1)';
+        this.imageUrl = 'https://fusemaptest.s3.amazonaws.com/local/building_logo/d404b4e8-3d53-428e-b37a-f4fab20a2973floormap.png';
+        this.image2Url = 'https://fusemaptest.s3.amazonaws.com/local/building_logo/d404b4e8-3d53-428e-b37a-f4fab20a2973floormap.png';
+        this.strokeColor = 'rgba(0, 3, 188, 0.7)';
+        this.fillColor = 'rgba(123, 125, 243, 0.2)';
+        this.handleFillColor = 'rgba(123, 125, 243, 0.2)';
         this.handleStrokeColor = 'rgba(0, 0, 0, 1)';
         this.updateWhileMoving = true;
         this.defaults = [
             [[10, 50], [200, 62], [120, 200]],
-            [[310, 50], [500, 90], [420, 200], [320, 210]]
+            [[310, 50], [500, 90], [420, 200], [320, 210]],
+            [[110, 50]]
         ];
     }
 
     onAddShape(): void {
         alert('A new shape has been added.');
+        // pop up model will be enabled.
     }
 
     onRemoveShape(event: number): void {

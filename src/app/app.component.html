@@ -2,6 +2,7 @@
   <div class="left">
     <button (click)="areaDraw.startPaint()">New shape</button>
     <button (click)="areaDraw.addPoint()">New Point</button>
+    <button (click)="areaDraw.addCirclePoint()">New Circle Point</button>
   </div>
   <div class="right">
     <button (click)="reset()">Reset</button>
@@ -48,7 +49,8 @@
          [fillColor]="fillColor"
          [handleFillColor]="handleFillColor"
          [handleStrokeColor]="handleStrokeColor"
-         [canvasAreaDraw]="imageUrl"></div>
+         [canvasAreaDraw]="imageUrl">
+    </div>
   </div>
 
   <div class="right">

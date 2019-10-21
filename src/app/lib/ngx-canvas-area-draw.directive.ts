@@ -2,6 +2,7 @@ import {
   Directive, ElementRef, Input, Renderer2, NgZone, Output, EventEmitter, AfterViewInit, OnDestroy
 } from '@angular/core';
 import { Shape } from './ngx-canvas-area-draw.shape';
+import { Circle } from './ngx-canvas-area-draw.circle';
 import { Pencil } from './ngx-canvas-area-draw.pencil';
 import { Subscription } from 'rxjs';
 
@@ -303,10 +304,30 @@ export class CanvasAreaDraw implements AfterViewInit, OnDestroy {
     this._MousemoveListen = this.renderer.listen(this._baseCanvas, 'mousemove', this._onMovePoint.bind(this));
   }
 
+  addCirclePoint(): void {
+    this.isDrawing = true;
+    this.renderer.setStyle(this._pencil.canvas, 'display', 'block');
+    this.renderer.setStyle(this._pencil.canvas, 'z-index', this.shapes.length + 2);
+    this.renderer.setStyle(this._baseCanvas, 'z-index', this.shapes.length + 3);
+    this.renderer.setStyle(this._baseCanvas, 'cursor', 'copy');
+
+    this._pencilSubscription = this._pencil.onCompleted().subscribe(() => {
+      this._stopPaint();
+    });
+    this._pencil.addCirclePoint();
+    this._MousemoveListen = this.renderer.listen(this._baseCanvas, 'mousemove', this._onMovePoint.bind(this));
+  }
+
   addShape(points: Array<Array<any>> = [], emit: boolean = true): void {
-    const shape: Shape = new Shape(this.renderer,
-     this.element, points, this.strokeColor, this.fillColor, this.handleFillColor, this.handleStrokeColor);
-    this._setStyle(shape.canvas, (this.shapes.length + 2).toString());
+    let shape;
+    if (points.length > 1) {
+      shape = new Shape(this.renderer,
+        this.element, points, this.strokeColor, this.fillColor, this.handleFillColor, this.handleStrokeColor);
+    } else {
+      shape = new Circle(this.renderer,
+        this.element, points, this.strokeColor, this.fillColor, this.handleFillColor, this.handleStrokeColor);
+    }
+       this._setStyle(shape.canvas, (this.shapes.length + 2).toString());
     this.renderer.setStyle(this._baseCanvas, 'z-index', this.shapes.length + 3);
 
     const subscription1 = shape.activeMovePoint().subscribe(() => {

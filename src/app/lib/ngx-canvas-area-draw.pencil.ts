@@ -9,6 +9,7 @@ export class Pencil {
   private _activePointPos: number;
   private _complete: boolean;
   private _isAddPoint: boolean;
+  private _isAddCiclePoint: boolean;
 
   constructor(private renderer: Renderer2,
         private parent: ElementRef,
@@ -30,13 +31,14 @@ export class Pencil {
     this.points = [];
     this._activePointPos = 0;
     this._complete = false;
+    this._isAddCiclePoint = false;
     this._isAddPoint = false;
     this.renderer.setStyle(this.canvas, 'display', 'none');
     this.context.canvas.width = this.context.canvas.width;
   }
 
   onMouseup(event: any, mousePos: any): void {
-    if (!this._complete && !this._isAddPoint) {
+    if (!this._complete && !this._isAddPoint && !this._isAddCiclePoint) {
       if (event.which === 1) {
         let dis: number,
           minDis: number = 0,
@@ -73,7 +75,7 @@ export class Pencil {
         }
       }
       this._draw();
-    } else if (this._isAddPoint) {
+    } else if (this._isAddPoint && !this._isAddCiclePoint) {
       this.points = [
         [mousePos.x - 10, mousePos.y - 10],
         [mousePos.x + 10, mousePos.y - 10],
@@ -81,6 +83,11 @@ export class Pencil {
         [mousePos.x - 10, mousePos.y + 10],
       ];
       this.completed.emit();
+    } else if (this._isAddCiclePoint) {
+      this.points = [
+        [mousePos.x, mousePos.y],
+      ];
+      this._drawCircle();
     }
   }
 
@@ -133,7 +140,21 @@ export class Pencil {
     this.context.stroke();
   }
 
+  private _drawCircle(): void {
+    this.context.canvas.width = this.context.canvas.width;
+    this.context.globalCompositeOperation = 'destination-over';
+    this.context.lineWidth = 1;
+    this.context.beginPath();
+    this.context.arc(this.points[0][0], this.points[0][1], 10, 0, 2 * Math.PI);
+    this.context.stroke();
+    this.completed.emit();
+  }
+
   addPoint(): void {
     this._isAddPoint = true;
+  }
+
+  addCirclePoint(): void {
+    this._isAddCiclePoint = true;
   }
 }
