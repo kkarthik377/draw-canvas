@@ -42,12 +42,23 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   pathAdded: EventEmitter<void> = new EventEmitter();
   @Output()
   pathDeleted: EventEmitter<number> = new EventEmitter<number>();
+  @Output()
+  updateImageSize: EventEmitter<{width: number | string, height: number | string}> = new EventEmitter<{width: number | string, height: number | string}>()
+  @Output()
+  setScale: EventEmitter<number> = new EventEmitter<number>();
 
   paths: BasePath[] = [];
   height: number;
   width: number;
+  imageWidth: number;
+  imageHeight: number;
   isLoading: boolean;
   isDrawing: boolean;
+  isDraggable: boolean = false;
+  lastX: number = 0;
+  lastY: number = 0;
+  marginLeft: number = 0;
+  marginTop: number = 0;
 
   private _pencil: Pencil;
   private _activePathPosition: number;
@@ -55,6 +66,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   private _baseImage: HTMLImageElement;
   private _pencilSubscription: Subscription;
   private _pathsSubscription: Subscription[][];
+  private _zoomScale: number = 1;
+  private _baseDiv: HTMLElement;
 
   constructor(
     private  element: ElementRef,
@@ -74,6 +87,18 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   get imageUrl() {
     return this._imageUrl;
+  }
+
+  @Input('zoomScale')
+  set zoomScale (scale: number) {
+    this._zoomScale = scale;
+    if (this._zoomScale === 1 && this._baseDiv) {
+      this._baseDiv.style.left = '0px';
+      this._baseDiv.style.top = '0px';
+      this.resetImageWidth();
+    } else if (this._zoomScale > 1) {
+      this.setImageWidth();
+    }
   }
 
   // toDo: fox, 4/10/19 Receive also an image file
@@ -308,6 +333,11 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   private scaleContent() {
+    if (this._zoomScale > 1) {
+      this.setScale.emit(1);
+      return;
+    }
+    this.resetImageWidth();
     this._updateGeometry();
 
     if (this._baseCanvas) {
@@ -447,6 +477,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _createNewBaseCanvas() {
     this._removeBaseCanvas();
+    this._baseDiv = document.getElementById('myCanvas');
     this._baseCanvas = this.renderer.createElement('canvas');
     this.renderer.appendChild(this.element.nativeElement, this._baseCanvas);
 
@@ -470,6 +501,31 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
       'contextmenu',
       this._onContextmenu.bind(this)
     );
+    this._MousemoveListenerForCanvas = this.renderer.listen(
+      this._baseDiv,
+      'mousemove',
+      this._onCanvasMovePath.bind(this)
+    );
+  }
+
+  private _onCanvasMovePath(event: MouseEvent): boolean  {
+    event.preventDefault();
+    if (this.isDraggable){
+      const rect = this._baseDiv.getBoundingClientRect();
+      const mousePos = {
+        x: (event.clientX) / this._zoomScale,
+        y: (event.clientY) / this._zoomScale
+      };
+      const deltaX = mousePos.x - this.lastX;
+      const deltaY = mousePos.y - this.lastY;
+      this.lastX = mousePos.x;
+      this.lastY = mousePos.y;
+      this.marginLeft = this.marginLeft + deltaX;
+      this.marginTop = this.marginTop + deltaY;
+      this._baseDiv.style.left = this.marginLeft + 'px';
+      this._baseDiv.style.top = this.marginTop + 'px';
+    }
+    return false;
   }
 
   private _removePencil() {
@@ -488,6 +544,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this.height = null;
     this.width = null;
     this._activePathPosition = null;
+    this.isDraggable = false;
+    this.resetImageWidth();
   }
 
   private _createBaseImage() {
@@ -591,6 +649,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _onMouseleave(): boolean {
     this._setActivePathPosition(null);
+    this.isDraggable = false;
+    this.resetImageWidth();
     if (!this.isDrawing) {
       this._MousemoveListener();
       this.renderer.setStyle(
@@ -612,7 +672,17 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
           if (typeof (this._activePathPosition) === 'number' && this.paths.length > this._activePathPosition) {
             this.paths[this._activePathPosition].onMousedown(event, mousePos);
+          } else if (this._zoomScale > 1) {
+            this.isDraggable = true;
+            this.lastX = (event.clientX) / this._zoomScale;
+            this.lastY = (event.clientY) / this._zoomScale;
+            // this.setImageWidth();
           }
+        } else if (this._zoomScale > 1) {
+          this.isDraggable = true;
+          this.lastX = (event.clientX) / this._zoomScale;
+          this.lastY = (event.clientY) / this._zoomScale;
+          // this.setImageWidth();
         }
       } else {
         this.renderer.setStyle(
@@ -627,6 +697,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _onMouseup(event: MouseEvent): boolean {
     if (event.button < 2) {
+      this.isDraggable = false;
+      this.resetImageWidth();
       const mousePos = this._getMousePos(event);
       if (this.isDrawing) {
         this.renderer.setStyle(
@@ -736,8 +808,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   private _getMousePos(event: MouseEvent): MousePosition {
     const rect = this._baseCanvas.getBoundingClientRect();
     return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top
+      x: (event.clientX - rect.left) / this._zoomScale,
+      y: (event.clientY - rect.top) / this._zoomScale
     };
   }
 
@@ -797,6 +869,22 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this._ContextmenuListener();
   }
 
+  private setImageWidth(): void {
+    this.updateImageSize.emit({
+      width: this.width + 'px',
+      height: this.height + 'px'
+    });
+  }
+
+  private resetImageWidth(): void {
+    if (this._zoomScale === 1) {
+      this.updateImageSize.emit({
+        width: 'auto',
+        height: 'auto'
+      });
+    }
+  }
+
   private _MousedownListener(): void {
   }
 
@@ -816,5 +904,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   }
 
   private _ImageErrorListener(): void {
+  }
+
+  private _MousemoveListenerForCanvas(): void {
   }
 }

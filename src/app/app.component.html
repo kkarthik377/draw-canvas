@@ -3,6 +3,12 @@
     <button (click)="areaDraw.startDrawing()">
       New path
     </button>
+    <button (click)="zoomScale = zoomScale === 3 ? zoomScale : zoomScale + 0.25">
+      ZoomIn
+    </button>
+    <button (click)="zoomScale = zoomScale === 1 ? zoomScale : zoomScale - 0.25">
+      ZoomOut
+    </button>
   </div>
 
   <div class="right">
@@ -19,72 +25,79 @@
 <div class="content">
   <div class="left">
     <div class="settings">
-
       <div>
         <label>Image URL</label>
-        <input type="text"
-               [(ngModel)]="imageUrl"
-               (keyup)="reset()">
+        <input type="text" [(ngModel)]="imageUrl" (keyup)="reset()" />
       </div>
 
       <div>
         <label>Update while moving</label>
-        <input type="checkbox"
-               [(ngModel)]="updateWhileMoving">
+        <input type="checkbox" [(ngModel)]="updateWhileMoving" />
       </div>
 
       <div>
         <label>Allow delete</label>
-        <input type="checkbox"
-               [(ngModel)]="allowDelete">
+        <input type="checkbox" [(ngModel)]="allowDelete" />
       </div>
 
       <div>
         <label>Stroke Color</label>
-        <input type="text"
-               [(ngModel)]="strokeColor">
+        <input type="text" [(ngModel)]="strokeColor" />
       </div>
 
       <div>
         <label>Fill Color</label>
-        <input type="text"
-               [(ngModel)]="fillColor">
+        <input type="text" [(ngModel)]="fillColor" />
       </div>
 
       <div>
         <label>Handler Fill Color</label>
-        <input type="text"
-               [(ngModel)]="handlerFillColor">
+        <input type="text" [(ngModel)]="handlerFillColor" />
       </div>
 
       <div>
         <label>Handler Stroke Color</label>
-        <input type="text"
-               [(ngModel)]="handlerStrokeColor">
+        <input type="text" [(ngModel)]="handlerStrokeColor" />
       </div>
     </div>
 
-    <div #areaDraw="canvasAreaDraw"
-         (activePathChange)="onSceneChange($event)"
-         (pathAdded)="onAddPath()"
-         (pathDeleted)="onRemovePath($event)"
-         [defaultPaths]="defaults"
-         [defaultActivePathIndex]="1"
-         [allowDelete]="allowDelete"
-         [notifyWhileMoving]="updateWhileMoving"
-         [strokeColor]="strokeColor"
-         [fillColor]="fillColor"
-         [handlerFillColor]="handlerFillColor"
-         [handlerStrokeColor]="handlerStrokeColor"
-         [canvasAreaDraw]="imageUrl"></div>
+    <div
+      [style.width]="imageWidth"
+      [style.height]="imageHeight"
+      [style.overflow]="imageDivOverflow"
+      style="border: red solid 1px;"
+    >
+      <div
+        #areaDraw="canvasAreaDraw"
+        id="myCanvas"
+        (activePathChange)="onSceneChange($event)"
+        (pathAdded)="onAddPath()"
+        (pathDeleted)="onRemovePath($event)"
+        (updateImageSize)="onImageSizeChange($event)"
+        (setScale)="setScale($event)"
+        [defaultPaths]="defaults"
+        [defaultActivePathIndex]="1"
+        [allowDelete]="allowDelete"
+        [notifyWhileMoving]="updateWhileMoving"
+        [strokeColor]="strokeColor"
+        [fillColor]="fillColor"
+        [handlerFillColor]="handlerFillColor"
+        [handlerStrokeColor]="handlerStrokeColor"
+        [canvasAreaDraw]="imageUrl"
+        [zoomScale]="zoomScale"
+        [style.transform]="'scale(' + zoomScale + ')'"
+      ></div>
+    </div>
   </div>
 
   <div class="right">
-    <div #area2Draw="canvasAreaDraw"
-         [strokeColor]="strokeColor"
-         [fillColor]="fillColor"
-         [handlerFillColor]="handlerFillColor"
-         [handlerStrokeColor]="handlerStrokeColor"
-         [canvasAreaDraw]="image2Url"></div>
+    <div
+      #area2Draw="canvasAreaDraw"
+      [strokeColor]="strokeColor"
+      [fillColor]="fillColor"
+      [handlerFillColor]="handlerFillColor"
+      [handlerStrokeColor]="handlerStrokeColor"
+      [canvasAreaDraw]="image2Url"
+    ></div>
   </div>
 </div>
