@@ -44,6 +44,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   pathDeleted: EventEmitter<number> = new EventEmitter<number>();
   @Output()
   updateImageSize: EventEmitter<{width: number | string, height: number | string}> = new EventEmitter<{width: number | string, height: number | string}>()
+  @Output()
+  setScale: EventEmitter<number> = new EventEmitter<number>();
 
   paths: BasePath[] = [];
   height: number;
@@ -331,6 +333,10 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   private scaleContent() {
+    if (this._zoomScale > 1) {
+      this.setScale.emit(1);
+      return;
+    }
     this.resetImageWidth();
     this._updateGeometry();
 

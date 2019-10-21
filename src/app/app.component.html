@@ -3,10 +3,10 @@
     <button (click)="areaDraw.startDrawing()">
       New path
     </button>
-    <button (click)="zoomScale = zoomScale === 3 ? zoomScale : zoomScale + 1">
+    <button (click)="zoomScale = zoomScale === 3 ? zoomScale : zoomScale + 0.25">
       ZoomIn
     </button>
-    <button (click)="zoomScale = zoomScale === 1 ? zoomScale : zoomScale - 1">
+    <button (click)="zoomScale = zoomScale === 1 ? zoomScale : zoomScale - 0.25">
       ZoomOut
     </button>
   </div>
@@ -74,6 +74,7 @@
         (pathAdded)="onAddPath()"
         (pathDeleted)="onRemovePath($event)"
         (updateImageSize)="onImageSizeChange($event)"
+        (setScale)="setScale($event)"
         [defaultPaths]="defaults"
         [defaultActivePathIndex]="1"
         [allowDelete]="allowDelete"

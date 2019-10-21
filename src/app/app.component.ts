@@ -94,4 +94,8 @@ export class AppComponent implements OnInit {
     this.imageHeight = event.height;
     this.ngZone.run(() => {});
   }
+
+  setScale(event: number): void {
+    this.zoomScale = event;
+  }
 }
