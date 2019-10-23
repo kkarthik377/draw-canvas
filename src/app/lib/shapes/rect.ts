@@ -1,11 +1,12 @@
+
 import { ElementRef, Renderer2 } from '@angular/core';
 
-import { MousePosition } from '../models';
+import { MousePosition, MinimumDistance, CloseStatus } from '../models';
 import { BaseShape } from './base-shape';
 import { BasePath } from './base-path';
 
 export class Rect extends BasePath {
-  static NAME = 'RECT';
+  static NAME: string = 'RECT';
 
   constructor(
     protected renderer: Renderer2,
@@ -14,6 +15,7 @@ export class Rect extends BasePath {
     protected strokeColor: string,
     protected handlerFillColor: string,
     protected handlerStrokeColor: string,
+    id: number,
     points: number[][],
     forcedAspectRatio: number,
     keepInsideContainer: boolean
@@ -25,6 +27,7 @@ export class Rect extends BasePath {
       strokeColor,
       handlerFillColor,
       handlerStrokeColor,
+      id,
       points,
       forcedAspectRatio,
       keepInsideContainer,
@@ -33,8 +36,8 @@ export class Rect extends BasePath {
     );
   }
 
-  onMousedown(event: MouseEvent, mousePos: MousePosition) {
-    const distances = this._getDistances(mousePos);
+  onMousedown(event: MouseEvent, mousePos: MousePosition): void {
+    const distances: MinimumDistance = this._getDistances(mousePos);
     if (this._shouldStartReizingPath(distances)) {
       this._startResizingPath(distances.minDistanceIndex);
     } else if (this.context.isPointInPath(mousePos.x, mousePos.y)) {
@@ -42,15 +45,15 @@ export class Rect extends BasePath {
     }
   }
 
-  onMouseup(event: MouseEvent, mousePos: MousePosition, allowDelete = true): string {
-    const distances = this._getDistances(mousePos);
+  onMouseup(event: MouseEvent, mousePos: MousePosition, allowDelete: boolean = true): string {
+    const distances: MinimumDistance = this._getDistances(mousePos);
     if (distances.minDistance < BaseShape.CLOSE_LIMIT && distances.minDistanceIndex >= 0) {
       if (event.button === 1 && this.points.length > 3) {
         this._deleteNode(distances.minDistanceIndex);
         return 'delete node';
       }
     } else if (allowDelete) {
-      const states = this._getCloseStatus(mousePos);
+      const states: CloseStatus = this._getCloseStatus(mousePos);
       if (event.button === 1 && this.context.isPointInPath(mousePos.x, mousePos.y) && !states.isClose) {
         this.context.canvas.width = this.context.canvas.width;
         return 'delete path';
@@ -67,13 +70,13 @@ export class Rect extends BasePath {
       // toDo: fox, 4/10/19 Implement _fitInsideContainer
       // It should check if the next path size is not overflowing its container
       // if (this.keepInsideContainer && !this._fitInsideContainer(mousePos)) {
-      //   return;
+      // return;
       // }
 
       // toDo: fox, 4/10/19 FIX this calculations
       // This should use forcedAspectRatio || 1 as aspect ratio to grow
-      const resizeAspectRatioX = mousePos.x / this.points[this._activePointPos][0];
-      const resizeAspectRatioY = mousePos.y / this.points[this._activePointPos][1];
+      const resizeAspectRatioX: number = mousePos.x / this.points[this._activePointPos][0];
+      const resizeAspectRatioY: number = mousePos.y / this.points[this._activePointPos][1];
 
       this.points[0][0] /= resizeAspectRatioX;
       this.points[0][1] *= resizeAspectRatioY;
@@ -121,13 +124,13 @@ export class Rect extends BasePath {
     return Rect.NAME;
   }
 
-  protected _onInit() {
+  protected _onInit(): void {
     if (!this.points || this.points.length === 0) {
-      const height = 40 * (this.forcedAspectRatio || 1);
-      const left = 30;
-      const right = 70;
-      const top = 50 - (height / 2);
-      const bottom = 50 + (height / 2);
+      const height: number = 40 * (this.forcedAspectRatio || 1);
+      const left: number = 30;
+      const right: number = 70;
+      const top: number = 50 - (height / 2);
+      const bottom: number = 50 + (height / 2);
       this.points = [
         [left, top],
         [right, top],

@@ -14,6 +14,7 @@ export class GenericPath extends BasePath {
     protected strokeColor: string,
     protected handlerFillColor: string,
     protected handlerStrokeColor: string,
+    id: number,
     points: number[][],
     forcedAspectRatio: number,
     keepInsideContainer: boolean
@@ -25,6 +26,7 @@ export class GenericPath extends BasePath {
       strokeColor,
       handlerFillColor,
       handlerStrokeColor,
+      id,
       points,
       forcedAspectRatio,
       keepInsideContainer,

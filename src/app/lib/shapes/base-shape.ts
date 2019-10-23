@@ -3,7 +3,7 @@ import { ElementRef, Renderer2 } from '@angular/core';
 import { Boundaries, Colors, MinimumDistance, MousePosition } from '../models';
 
 export abstract class BaseShape {
-  static CLOSE_LIMIT = 6;
+  static CLOSE_LIMIT: number = 6;
 
   points: number[][];
   canvas: HTMLCanvasElement;
@@ -46,14 +46,14 @@ export abstract class BaseShape {
 
   public abstract onMovePoint(event: MouseEvent, mousePos: MousePosition): void;
 
-  getPositionInPercent(mousePos: MousePosition) {
+  getPositionInPercent(mousePos: MousePosition): MousePosition {
     return {
       x: this.xToPercent(mousePos.x),
       y: this.yToPercent(mousePos.y)
     };
   }
 
-  getPointInPx(point: number[]) {
+  getPointInPx(point: number[]): number[] {
     return [
       this.xToPx(point[0]),
       this.yToPx(point[1])
@@ -76,15 +76,15 @@ export abstract class BaseShape {
     return value * this.canvas.height / 100;
   }
 
-  pxToPercent(value: number) {
+  pxToPercent(value: number): number {
     return value * 100 / Math.max(this.canvas.height, this.canvas.width);
   }
 
-  getBoundaries(inPx = true): Boundaries {
-    let minX = 100;
-    let maxX = 0;
-    let minY = 100;
-    let maxY = 0;
+  getBoundaries(inPx: boolean = true): Boundaries {
+    let minX: number = 100;
+    let maxX: number = 0;
+    let minY: number = 100;
+    let maxY: number = 0;
 
     this.points
       .filter((point: number[]) => point && point.length > 0)
@@ -119,12 +119,12 @@ export abstract class BaseShape {
   }
 
   getWidth(): number {
-    const boundaries = this.getBoundaries();
+    const boundaries: Boundaries = this.getBoundaries();
     return boundaries.maxX - boundaries.minX;
   }
 
   getHeight(): number {
-    const boundaries = this.getBoundaries();
+    const boundaries: Boundaries = this.getBoundaries();
     return boundaries.maxY - boundaries.minY;
   }
 
@@ -132,14 +132,14 @@ export abstract class BaseShape {
 
   protected abstract _onInit(): void;
 
-  protected _drawPoint(point: number[]) {
+  protected _drawPoint(point: number[]): void {
     this.context.fillStyle = this.handlerFillColor;
     this.context.strokeStyle = this.handlerStrokeColor;
     this.context.fillRect(point[0] - 3, point[1] - 3, 6, 6);
     this.context.strokeRect(point[0] - 3, point[1] - 3, 6, 6);
   }
 
-  protected _drawExpander(point: number[]) {
+  protected _drawExpander(point: number[]): void {
     this.context.beginPath();
     this.context.fillStyle = this.handlerFillColor;
     this.context.strokeStyle = this.handlerStrokeColor;
@@ -155,13 +155,13 @@ export abstract class BaseShape {
   }
 
   protected _getDistances(mousePos: MousePosition): MinimumDistance {
-    let distanceFromMouse;
-    let minDistance = 0;
-    let minDistanceIndex = -1;
+    let distanceFromMouse: number;
+    let minDistance: number = 0;
+    let minDistanceIndex: number = -1;
 
-    for (let i = 0; i < this.points.length - 1; ++i) {
+    for (let i: number = 0; i < this.points.length - 1; ++i) {
       if (this.points[i]) {
-        const point = this.getPointInPx(this.points[i]);
+        const point: number[] = this.getPointInPx(this.points[i]);
         distanceFromMouse = Math.sqrt(
           Math.pow(mousePos.x - point[0], 2) + Math.pow(mousePos.y - point[1], 2)
         );
@@ -178,7 +178,7 @@ export abstract class BaseShape {
     };
   }
 
-  private _initializeCanvas() {
+  private _initializeCanvas(): void {
     this.canvas = this.renderer.createElement('canvas');
     this.context = this.canvas.getContext('2d');
     this.renderer.appendChild(

@@ -1,5 +1,9 @@
 <div class="actions">
   <div class="left">
+      
+    <button (click)="areaDraw.addCirclePoint()">
+      New Circle Path
+    </button>
     <button (click)="areaDraw.startDrawing()">
       New path
     </button>
@@ -71,7 +75,7 @@
         #areaDraw="canvasAreaDraw"
         id="myCanvas"
         (activePathChange)="onSceneChange($event)"
-        (pathAdded)="onAddPath()"
+        (pathAdded)="onAddPath($event)"
         (pathDeleted)="onRemovePath($event)"
         (updateImageSize)="onImageSizeChange($event)"
         (setScale)="setScale($event)"

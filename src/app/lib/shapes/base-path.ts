@@ -1,6 +1,6 @@
 import { ElementRef, EventEmitter, Renderer2 } from '@angular/core';
 
-import { CloseStatus, MinimumDistance, MousePosition, PathData } from '../models';
+import { CloseStatus, MinimumDistance, MousePosition, PathData, Boundaries } from '../models';
 import { calcPointSegmentDistance } from './utils';
 import { BaseShape } from './base-shape';
 
@@ -22,6 +22,7 @@ export abstract class BasePath extends BaseShape {
     protected strokeColor: string,
     protected handlerFillColor: string,
     protected handlerStrokeColor: string,
+    id: number,
     points: number[][],
     forcedAspectRatio: number,
     keepInsideContainer: boolean,
@@ -97,13 +98,13 @@ export abstract class BasePath extends BaseShape {
     this.draw();
   }
 
-  protected _isPositionInsideContainer(mousePos: MousePosition) {
-    const boundaries = this.getBoundaries(false);
+  protected _isPositionInsideContainer(mousePos: MousePosition): boolean {
+    const boundaries: Boundaries = this.getBoundaries(false);
 
-    const minX = mousePos.x - this._movePathStartPoint.x + boundaries.minX;
-    const minY = mousePos.y - this._movePathStartPoint.y + boundaries.minY;
-    const maxX = mousePos.x - this._movePathStartPoint.x + boundaries.maxX;
-    const maxY = mousePos.y - this._movePathStartPoint.y + boundaries.maxY;
+    const minX: number = mousePos.x - this._movePathStartPoint.x + boundaries.minX;
+    const minY: number = mousePos.y - this._movePathStartPoint.y + boundaries.minY;
+    const maxX: number = mousePos.x - this._movePathStartPoint.x + boundaries.maxX;
+    const maxY: number = mousePos.y - this._movePathStartPoint.y + boundaries.maxY;
 
     return (
       minX >= 0
@@ -113,7 +114,7 @@ export abstract class BasePath extends BaseShape {
     );
   }
 
-  protected _deleteNode(index: number) {
+  protected _deleteNode(index: number): void {
     if (this.allowModifyPoints) {
       this.points.splice(index, 1);
       this._activePointPos = null;
@@ -121,7 +122,7 @@ export abstract class BasePath extends BaseShape {
     }
   }
 
-  protected _addPoint(insertAt: number, mousePos: MousePosition) {
+  protected _addPoint(insertAt: number, mousePos: MousePosition): void {
     if (this.allowModifyPoints && this.allowAddNewPoints) {
       mousePos = this.getPositionInPercent(mousePos);
       this.points.splice(
@@ -135,17 +136,17 @@ export abstract class BasePath extends BaseShape {
     }
   }
 
-  protected _startResizingPath(index: number) {
+  protected _startResizingPath(index: number): void {
     this._activePointPos = index;
     this.resizingPath.emit();
   }
 
-  protected _startMovingPath(mousePos: MousePosition) {
+  protected _startMovingPath(mousePos: MousePosition): void {
     this._movePathStartPoint = this.getPositionInPercent(mousePos);
     this.movingPath.emit();
   }
 
-  protected _startMovingPointInIndex(index: number) {
+  protected _startMovingPointInIndex(index: number): void {
     this._activePointPos = index;
     this.movingPoint.emit(index);
   }
@@ -182,13 +183,13 @@ export abstract class BasePath extends BaseShape {
   }
 
   protected _getCloseStatus(mousePos: MousePosition): CloseStatus {
-    let lineDis;
-    let isClose = false;
-    let insertAt = this.points.length;
-    const closeLimit = this.pxToPercent(BaseShape.CLOSE_LIMIT);
+    let lineDis ;
+    let isClose: boolean = false;
+    let insertAt: number = this.points.length;
+    const closeLimit: number = this.pxToPercent(BaseShape.CLOSE_LIMIT);
     mousePos = this.getPositionInPercent(mousePos);
 
-    for (let i = 0; i < this.points.length; ++i) {
+    for (let i: number = 0; i < this.points.length; ++i) {
       if (this.points[i]) {
         if (i >= 1) {
           lineDis = calcPointSegmentDistance(

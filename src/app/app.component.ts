@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 
-import { GenericPath, NgxCanvasAreaDrawDirective, PathData, Rect } from 'ngx-canvas-area-draw';
+import { GenericPath, NgxCanvasAreaDrawDirective, PathData, Rect, Circle } from 'ngx-canvas-area-draw';
 
 @Component({
   selector: 'app-root',
@@ -31,10 +31,10 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.imageUrl = 'https://i.imgur.com/0wMJHZK.jpg';
+    this.imageUrl = 'https://fusemaptest.s3.amazonaws.com/local/building_logo/d404b4e8-3d53-428e-b37a-f4fab20a2973floormap.png';
 
-    this.strokeColor = 'rgba(255, 255, 255, 0.7)';
-    this.fillColor = 'rgba(255, 255, 255, 0.2)';
+    this.strokeColor = 'rgba(0, 3, 188, 0.7)';
+    this.fillColor = 'rgba(123, 125, 243, 0.2)';
     this.handlerFillColor = 'rgba(255, 255, 255, 1)';
     this.handlerStrokeColor = 'rgba(0, 0, 0, 1)';
 
@@ -44,21 +44,30 @@ export class AppComponent implements OnInit {
       {
         name: GenericPath.NAME,
         points: [[10, 10], [20, 10], [15, 25]],
-        keepInsideContainer: true
+        keepInsideContainer: true,
+        id: 14
       },
       {
         name: Rect.NAME,
-        keepInsideContainer: true
+        points: [[10, 10], [20, 10], [20, 20], [10, 20]],
+        keepInsideContainer: true,
+        id: 15
       },
       {
-        name: GenericPath.NAME,
-        points: [[70, 60], [80, 60], [90, 80], [60, 80]],
-        keepInsideContainer: true
-      }
+        name: Circle.NAME,
+        points: [[10, 10]],
+        keepInsideContainer: true,
+        id: 16
+      },
+      // {
+      //   name: GenericPath.NAME,
+      //   points: [[70, 60], [80, 60], [90, 80], [60, 80]],
+      //   keepInsideContainer: true
+      // }
     ];
   }
 
-  onAddPath() {
+  onAddPath(event) {
     alert('A new path has been added.');
   }
 

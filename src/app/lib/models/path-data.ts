@@ -3,4 +3,5 @@ export interface PathData {
   points?: number[][];
   forcedAspectRatio?: number;
   keepInsideContainer?: boolean;
+  id?: number;
 }

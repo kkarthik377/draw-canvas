@@ -14,7 +14,7 @@ import {
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
-import { getShape, BasePath, GenericPath, Pencil } from './shapes';
+import { getShape, BasePath, GenericPath, Pencil, Circle } from './shapes';
 import { MousePosition, PathData } from './models';
 
 // toDo: fox, 4/10/19 Rename to cadWorkspace
@@ -39,7 +39,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   @Output()
   activePathChange: EventEmitter<number> = new EventEmitter<number>();
   @Output()
-  pathAdded: EventEmitter<void> = new EventEmitter();
+  pathAdded: EventEmitter<object> = new EventEmitter();
   @Output()
   pathDeleted: EventEmitter<number> = new EventEmitter<number>();
   @Output()
@@ -251,6 +251,24 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
+  addCirclePoint(): void {
+    if (!this.isLoading && !this.isDrawing) {
+      this.isDrawing = true;
+      this._setActivePathPosition(null);
+      this._setUpPencil();
+
+      this._pencilSubscription = this._pencil.completed
+        .pipe(take(1))
+        .subscribe(() => this._finishDrawing());
+      this._pencil.addCirclePoint();
+      this._MousemoveListener = this.renderer.listen(
+        this._baseCanvas,
+        'mousemove',
+        this._onMovePoint.bind(this)
+      );
+    }
+  }
+
   addPath(pathData: PathData, notifyChange: boolean = true): void {
     const newPath = getShape(
       pathData.name,
@@ -261,6 +279,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
         this.fillColor,
         this.handlerFillColor,
         this.handlerStrokeColor,
+        pathData.id,
         pathData.points,
         pathData.forcedAspectRatio,
         pathData.keepInsideContainer
@@ -313,7 +332,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
         .forEach((path: BasePath) => {
           path.isActive = false;
         });
-      this.pathAdded.emit();
+      this.pathAdded.emit({paths: this.paths});
       this._setActivePathPosition(this.paths.length - 1);
     }
   }
@@ -629,7 +648,13 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
         'default'
       );
       this._pencil.reset();
-      if (points) {
+      // circle
+      if (points.length === 1) {
+        this.addPath({
+          name: Circle.NAME,
+          points
+        });
+      } else {
         this.addPath({
           name: GenericPath.NAME,
           points
