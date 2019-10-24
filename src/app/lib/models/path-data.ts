@@ -4,4 +4,8 @@ export interface PathData {
   forcedAspectRatio?: number;
   keepInsideContainer?: boolean;
   id?: number;
+  strokeColor?: string;
+  fillColor?: string;
+  handlerFillColor?: string;
+  handlerStrokeColor?: string;
 }

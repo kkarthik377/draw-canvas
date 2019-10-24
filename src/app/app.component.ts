@@ -27,8 +27,23 @@ export class AppComponent implements OnInit {
   imageHeight: string = 'auto';
   imageDivOverflow: string = 'unset';
 
+  genericColors = {
+    strokeColor : 'rgba(55, 160, 102, 1)',
+    fillColor : 'rgba(137, 215, 182, 1)',
+    handlerFillColor : 'rgba(255, 255, 255, 1)',
+    handlerStrokeColor : 'rgba(0, 0, 0, 1)'
+  }
+
+  circleColors = {
+    strokeColor : 'rgba(222, 255, 0, 1)',
+    fillColor : 'rgba(255, 255, 0, 1)',
+    handlerFillColor : 'rgba(115, 47, 12, 1)',
+    handlerStrokeColor : 'rgba(0, 0, 0, 1)',
+  }
+
   constructor(private ngZone: NgZone) {
   }
+
 
   ngOnInit(): void {
     this.imageUrl = 'https://fusemaptest.s3.amazonaws.com/local/building_logo/d404b4e8-3d53-428e-b37a-f4fab20a2973floormap.png';
@@ -45,19 +60,25 @@ export class AppComponent implements OnInit {
         name: GenericPath.NAME,
         points: [[10, 10], [20, 10], [15, 25]],
         keepInsideContainer: true,
-        id: 14
+        id: 14,
+        ...this.genericColors
       },
       {
         name: Rect.NAME,
         points: [[10, 10], [20, 10], [20, 20], [10, 20]],
         keepInsideContainer: true,
-        id: 15
+        id: 15,
+        strokeColor : 'rgba(78, 0, 235, 1)',
+        fillColor : 'rgba(153, 102, 255, 1)',
+        handlerFillColor : 'rgba(58, 0, 173, 1)',
+        handlerStrokeColor : 'rgba(15, 0, 46, 1)',
       },
       {
         name: Circle.NAME,
         points: [[10, 10]],
         keepInsideContainer: true,
-        id: 16
+        id: 16,
+        ...this.circleColors
       },
       // {
       //   name: GenericPath.NAME,

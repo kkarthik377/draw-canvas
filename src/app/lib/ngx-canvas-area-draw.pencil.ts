@@ -42,7 +42,7 @@ export class Pencil {
           minDis: number = 0,
           minDisIndex: number = -1;
 
-        for (let i = 0; i < this.points.length - 1; ++i) {
+        for (let i: number = 0; i < this.points.length - 1; ++i) {
           if (this.points[i]) {
             dis = Math.sqrt(
               Math.pow(mousePos.x - this.points[i][0], 2) + Math.pow(mousePos.y - this.points[i][1], 2)
@@ -115,7 +115,7 @@ export class Pencil {
     this.context.lineWidth = 1;
 
     this.context.beginPath();
-    for (let i = 0; i < this.points.length; ++i) {
+    for (let i: number = 0; i < this.points.length; ++i) {
       if (this.points[i]) {
         this.context.fillStyle = this.handleFillColor;
         this.context.strokeStyle = this.handleStrokeColor;

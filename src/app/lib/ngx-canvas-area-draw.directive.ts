@@ -15,7 +15,7 @@ import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { getShape, BasePath, GenericPath, Pencil, Circle } from './shapes';
-import { MousePosition, PathData } from './models';
+import { MousePosition, PathData, Boundaries, Colors } from './models';
 
 // toDo: fox, 4/10/19 Rename to cadWorkspace
 @Directive({
@@ -23,10 +23,10 @@ import { MousePosition, PathData } from './models';
   exportAs: 'canvasAreaDraw'
 })
 export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
-  static DEFAULT_STROKE_COLOR = 'rgba(255, 255, 255, 0.7)';
-  static DEFAULT_FILL_COLOR = 'rgba(255, 255, 255, 0.2)';
-  static DEFAULT_HANDLER_STROKE_COLOR = 'rgba(255, 255, 255, 1)';
-  static DEFAULT_HANDLER_FILL_COLOR = 'rgba(255, 255, 255, 1)';
+  static DEFAULT_STROKE_COLOR: string = 'rgba(255, 255, 255, 0.7)';
+  static DEFAULT_FILL_COLOR: string = 'rgba(255, 255, 255, 0.2)';
+  static DEFAULT_HANDLER_STROKE_COLOR: string = 'rgba(255, 255, 255, 1)';
+  static DEFAULT_HANDLER_FILL_COLOR: string = 'rgba(255, 255, 255, 1)';
 
   @Input()
   defaultPaths: PathData[] = [];
@@ -85,7 +85,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _imageUrl: string;
 
-  get imageUrl() {
+  get imageUrl(): string {
     return this._imageUrl;
   }
 
@@ -124,7 +124,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _strokeColor: string = NgxCanvasAreaDrawDirective.DEFAULT_STROKE_COLOR;
 
-  get strokeColor() {
+  get strokeColor(): string {
     return this._strokeColor;
   }
 
@@ -138,7 +138,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _fillColor: string = NgxCanvasAreaDrawDirective.DEFAULT_FILL_COLOR;
 
-  get fillColor() {
+  get fillColor(): string {
     return this._fillColor;
   }
 
@@ -152,7 +152,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _handlerStrokeColor: string = NgxCanvasAreaDrawDirective.DEFAULT_HANDLER_STROKE_COLOR;
 
-  get handlerStrokeColor() {
+  get handlerStrokeColor(): string {
     return this._handlerStrokeColor;
   }
 
@@ -166,7 +166,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _handlerFillColor: string = NgxCanvasAreaDrawDirective.DEFAULT_HANDLER_FILL_COLOR;
 
-  get handlerFillColor() {
+  get handlerFillColor(): string {
     return this._handlerFillColor;
   }
 
@@ -187,10 +187,9 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   // base image
   // dimensions: width & height
   getPathImage(path: BasePath): string {
-    const canvas = this.renderer.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    const pathBoundaries = path.getBoundaries();
+    const canvas: HTMLCanvasElement = this.renderer.createElement('canvas');
+    const context: CanvasRenderingContext2D = canvas.getContext('2d');
+    const pathBoundaries: Boundaries = path.getBoundaries();
     canvas.width = pathBoundaries.maxX - pathBoundaries.minX;
     canvas.height = pathBoundaries.maxY - pathBoundaries.minY;
 
@@ -218,7 +217,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     return canvas.toDataURL(
       'image/png',
       0.96
-    )
+    );
   }
 
   // toDo: fox, 4/10/19 Implement a method to get the image file
@@ -227,13 +226,14 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
       position = this._activePathPosition;
     }
     if (typeof (position) === 'number' && this.paths.length > position) {
-      const path = this.paths[position];
+      const path: BasePath = this.paths[position];
       return this.getPathImage(path);
     }
     return null;
   }
 
-  startDrawing(): void {
+  startDrawing(colors: Colors): void {
+    this.setColors(colors);
     if (!this.isLoading && !this.isDrawing) {
       this.isDrawing = true;
       this._setActivePathPosition(null);
@@ -241,7 +241,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
       this._pencilSubscription = this._pencil.completed
         .pipe(take(1))
-        .subscribe(() => this._finishDrawing());
+        .subscribe(() => this._finishDrawing(colors));
 
       this._MousemoveListener = this.renderer.listen(
         this._baseCanvas,
@@ -251,7 +251,8 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  addCirclePoint(): void {
+  addCirclePoint(colors: Colors): void {
+    this.setColors(colors);
     if (!this.isLoading && !this.isDrawing) {
       this.isDrawing = true;
       this._setActivePathPosition(null);
@@ -259,7 +260,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
       this._pencilSubscription = this._pencil.completed
         .pipe(take(1))
-        .subscribe(() => this._finishDrawing());
+        .subscribe(() => this._finishDrawing(colors));
       this._pencil.addCirclePoint();
       this._MousemoveListener = this.renderer.listen(
         this._baseCanvas,
@@ -270,15 +271,15 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   }
 
   addPath(pathData: PathData, notifyChange: boolean = true): void {
-    const newPath = getShape(
+    const newPath: BasePath = getShape(
       pathData.name,
       [
         this.renderer,
         this.element,
-        this.strokeColor,
-        this.fillColor,
-        this.handlerFillColor,
-        this.handlerStrokeColor,
+        pathData.strokeColor,
+        pathData.fillColor,
+        pathData.handlerFillColor,
+        pathData.handlerStrokeColor,
         pathData.id,
         pathData.points,
         pathData.forcedAspectRatio,
@@ -345,13 +346,13 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _updateGeometry() {
+  private _updateGeometry(): void {
     this.height = this._baseImage.height;
     this.width = this._baseImage.width;
   }
 
   @HostListener('window:resize')
-  private scaleContent() {
+  private scaleContent(): void {
     if (this._zoomScale > 1) {
       this.setScale.emit(1);
       return;
@@ -374,7 +375,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     });
   }
 
-  private _setUpPencil() {
+  private _setUpPencil(): void {
     this.renderer.setStyle(
       this._pencil.canvas,
       'display',
@@ -397,7 +398,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     );
   }
 
-  private _setActivePathPosition(position: number, deactivateCurrent = true): void {
+  private _setActivePathPosition(position: number, deactivateCurrent: boolean = true): void {
     if (deactivateCurrent && typeof (this._activePathPosition) === 'number') {
       this.paths[this._activePathPosition].isActive = false;
     }
@@ -410,7 +411,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this.activePathChange.emit(position);
   }
 
-  private applyHandlerStrokeColor(color: string) {
+  private applyHandlerStrokeColor(color: string): void {
     this.paths.forEach((path: BasePath) => {
       path.setColors({
         handlerStrokeColor: color
@@ -424,7 +425,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _applyHandlerFillColor(color: string) {
+  private _applyHandlerFillColor(color: string): void {
     this.paths.forEach((path: BasePath) => {
       path.setColors({
         handlerFillColor: color
@@ -446,7 +447,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     });
   }
 
-  private _applyStrokeColor(color: string) {
+  private _applyStrokeColor(color: string): void {
     this.paths.forEach((path: BasePath) => {
       path.setColors({
         strokeColor: color
@@ -460,7 +461,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _removeBaseImage() {
+  private _removeBaseImage(): void {
     if (this._baseImage) {
       this._ImageLoadListener();
       this._ImageErrorListener();
@@ -472,7 +473,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _removeAllPaths() {
+  private _removeAllPaths(): void{
     this._deleteAllPathsSubscriptions();
     this.paths.forEach((path: BasePath) => {
       this.renderer.removeChild(
@@ -483,7 +484,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this.paths = [];
   }
 
-  private _removeBaseCanvas() {
+  private _removeBaseCanvas(): void {
     if (this._baseCanvas) {
       this._removeAllMouseListeners();
       this.renderer.removeChild(
@@ -494,7 +495,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _createNewBaseCanvas() {
+  private _createNewBaseCanvas(): void {
     this._removeBaseCanvas();
     this._baseDiv = document.getElementById('myCanvas');
     this._baseCanvas = this.renderer.createElement('canvas');
@@ -530,13 +531,13 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   private _onCanvasMovePath(event: MouseEvent): boolean  {
     event.preventDefault();
     if (this.isDraggable){
-      const rect = this._baseDiv.getBoundingClientRect();
-      const mousePos = {
+      // const rect = this._baseDiv.getBoundingClientRect();
+      const mousePos: MousePosition = {
         x: (event.clientX) / this._zoomScale,
         y: (event.clientY) / this._zoomScale
       };
-      const deltaX = mousePos.x - this.lastX;
-      const deltaY = mousePos.y - this.lastY;
+      const deltaX: number = mousePos.x - this.lastX;
+      const deltaY: number = mousePos.y - this.lastY;
       this.lastX = mousePos.x;
       this.lastY = mousePos.y;
       this.marginLeft = this.marginLeft + deltaX;
@@ -547,7 +548,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     return false;
   }
 
-  private _removePencil() {
+  private _removePencil(): void {
     if (this._pencil) {
       this.renderer.removeChild(
         this.element.nativeElement,
@@ -557,7 +558,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _resetIndicators() {
+  private _resetIndicators(): void {
     this.isLoading = true;
     this.isDrawing = false;
     this.height = null;
@@ -567,7 +568,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this.resetImageWidth();
   }
 
-  private _createBaseImage() {
+  private _createBaseImage(): void {
     this._baseImage = this.renderer.createElement('img');
     this.renderer.setAttribute(
       this._baseImage,
@@ -580,13 +581,13 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this.renderer.appendChild(this.element.nativeElement, this._baseImage);
   }
 
-  private _listenImageImageError() {
+  private _listenImageImageError(): void {
     this._ImageErrorListener = this.renderer.listen(this._baseImage, 'error', () => {
       this.isLoading = false;
     });
   }
 
-  private _listenImageLoad() {
+  private _listenImageLoad(): void {
     this._ImageLoadListener = this.renderer.listen(this._baseImage, 'load', () => {
       this._updateGeometry();
       this._createNewPencil();
@@ -596,7 +597,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     });
   }
 
-  private _createNewPencil() {
+  private _createNewPencil(): void {
     this._removePencil();
     this._pencil = new Pencil(
       this.renderer,
@@ -609,7 +610,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this._setStyle(this._pencil.canvas, '0');
   }
 
-  private _addDefaultPaths() {
+  private _addDefaultPaths(): void {
     if (this.defaultPaths.length > 0) {
       this.defaultPaths.forEach((pathData: PathData, index: number) => {
         this.addPath(pathData, false);
@@ -637,11 +638,11 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _finishDrawing(): void {
+  private _finishDrawing(colors: Colors): void {
     if (this.isDrawing) {
       this._MousemoveListener();
       this.isDrawing = false;
-      const points = this._pencil.points.filter(x => x);
+      const points: Array<Array<number>> = this._pencil.points.filter(x => x);
       this.renderer.setStyle(
         this._baseCanvas,
         'cursor',
@@ -652,18 +653,20 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
       if (points.length === 1) {
         this.addPath({
           name: Circle.NAME,
-          points
+          points,
+          ...colors
         });
       } else {
         this.addPath({
           name: GenericPath.NAME,
-          points
+          points,
+          ...colors
         });
       }
     }
   }
 
-  private _checkPathClicked(mousePos: MousePosition) {
+  private _checkPathClicked(mousePos: MousePosition): void {
     this.paths
       .filter((path: BasePath) => path.context.isPointInPath(mousePos.x, mousePos.y))
       .slice(-1)
@@ -690,7 +693,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   private _onMousedown(event: MouseEvent): boolean {
     event.preventDefault();
     if (event.button === 0) {
-      const mousePos = this._getMousePos(event);
+      const mousePos: MousePosition = this._getMousePos(event);
       if (!this.isDrawing) {
         if (this.paths.length > 0) {
           this._checkPathClicked(mousePos);
@@ -724,7 +727,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     if (event.button < 2) {
       this.isDraggable = false;
       this.resetImageWidth();
-      const mousePos = this._getMousePos(event);
+      const mousePos: MousePosition = this._getMousePos(event);
       if (this.isDrawing) {
         this.renderer.setStyle(
           this._baseCanvas,
@@ -752,7 +755,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     return false;
   }
 
-  private _deletePath() {
+  private _deletePath(): void {
     this.renderer.removeChild(
       this.element.nativeElement,
       this.paths[this._activePathPosition].canvas
@@ -782,7 +785,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _onMovePath(event: MouseEvent): boolean {
     if (typeof (this._activePathPosition) === 'number') {
-      const mousePos = this._getMousePos(event);
+      const mousePos: MousePosition = this._getMousePos(event);
       if (this.notifyWhileMoving) {
         this.activePathChange.emit(this._activePathPosition);
       }
@@ -797,7 +800,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   }
 
   private _onMovePoint(event: MouseEvent): boolean {
-    const mousePos = this._getMousePos(event);
+    const mousePos: MousePosition = this._getMousePos(event);
     if (this.isDrawing) {
       this._pencil.onMovePoint(event, mousePos);
     } else if (typeof (this._activePathPosition) === 'number') {
@@ -816,7 +819,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
 
   private _onResizePath(event: MouseEvent): boolean {
     if (typeof (this._activePathPosition) === 'number') {
-      const mousePos = this._getMousePos(event);
+      const mousePos: MousePosition = this._getMousePos(event);
       if (this.notifyWhileMoving) {
         this.activePathChange.emit(this._activePathPosition);
       }
@@ -831,7 +834,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   }
 
   private _getMousePos(event: MouseEvent): MousePosition {
-    const rect = this._baseCanvas.getBoundingClientRect();
+    const rect: ClientRect = this._baseCanvas.getBoundingClientRect();
     return {
       x: (event.clientX - rect.left) / this._zoomScale,
       y: (event.clientY - rect.top) / this._zoomScale
@@ -851,7 +854,7 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  private _setGeometry(element: any) {
+  private _setGeometry(element: any): void {
     this.renderer.setAttribute(
       element,
       'height',
@@ -880,13 +883,13 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     this._pathsSubscription.splice(pos, 1);
   }
 
-  private _removeAllListeners() {
+  private _removeAllListeners(): void {
     this._removeAllMouseListeners();
     this._ImageLoadListener();
     this._ImageErrorListener();
   }
 
-  private _removeAllMouseListeners() {
+  private _removeAllMouseListeners(): void {
     this._MousedownListener();
     this._MouseupListener();
     this._MouseLeaveListener();
@@ -932,5 +935,12 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
   }
 
   private _MousemoveListenerForCanvas(): void {
+  }
+
+  private setColors(colors: Colors): void {
+    this._strokeColor = colors.strokeColor;
+    this._handlerFillColor = colors.handlerFillColor;
+    this._handlerStrokeColor = colors.handlerStrokeColor;
+    this._fillColor = colors.fillColor;
   }
 }
