@@ -18,7 +18,8 @@ export abstract class BaseShape {
     protected strokeColor: string,
     protected handlerFillColor: string,
     protected handlerStrokeColor: string,
-    points: number[][]
+    points: number[][],
+    protected id: number,
   ) {
     this.points = points || [];
     this._initializeCanvas();

@@ -18,7 +18,8 @@ export class Pencil extends BaseShape {
     protected strokeColor: string,
     protected handlerFillColor: string,
     protected handlerStrokeColor: string,
-    points?: number[][]
+    points?: number[][],
+    id?: number
   ) {
     super(
       renderer,
@@ -27,7 +28,8 @@ export class Pencil extends BaseShape {
       strokeColor,
       handlerFillColor,
       handlerStrokeColor,
-      points
+      points,
+      id
     );
     this._onInit();
   }

@@ -654,13 +654,15 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
         this.addPath({
           name: Circle.NAME,
           points,
-          ...colors
+          ...colors,
+          id: Math.floor(Math.random() * 9000000) + 1000000
         });
       } else {
         this.addPath({
           name: GenericPath.NAME,
           points,
-          ...colors
+          ...colors,
+          id: Math.floor(Math.random() * 9000000) + 1000000
         });
       }
     }

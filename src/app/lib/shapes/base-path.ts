@@ -36,7 +36,8 @@ export abstract class BasePath extends BaseShape {
       strokeColor,
       handlerFillColor,
       handlerStrokeColor,
-      points
+      points,
+      id
     );
     this.keepInsideContainer = keepInsideContainer;
     this.forcedAspectRatio = forcedAspectRatio;
