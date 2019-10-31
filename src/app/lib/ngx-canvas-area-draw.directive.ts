@@ -780,6 +780,30 @@ export class NgxCanvasAreaDrawDirective implements AfterViewInit, OnDestroy {
     }
   }
 
+  deletePathById(id: number): void {
+    this.paths.map((pathData: BasePath, index: number) => {
+      if (id === pathData.id) {
+        this._activePathPosition = index;
+      }
+    });
+
+    this.renderer.removeChild(
+      this.element.nativeElement,
+      this.paths[this._activePathPosition].canvas
+    );
+    this.paths.splice(
+      this._activePathPosition,
+      1
+    );
+    this._deletePathSubscription(
+      this._activePathPosition
+    );
+    this.pathDeleted.emit(
+      this._activePathPosition
+    );
+    this._setActivePathPosition(null, false);
+  }
+
   private _onContextmenu(event: MouseEvent): boolean {
     event.preventDefault();
     return false;

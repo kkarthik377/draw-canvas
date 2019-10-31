@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 
-import { GenericPath, NgxCanvasAreaDrawDirective, PathData, Rect, Circle } from 'ngx-canvas-area-draw';
+import { GenericPath, NgxCanvasAreaDrawDirective, PathData, Rect, Circle, Colors } from 'ngx-canvas-area-draw';
 
 @Component({
   selector: 'app-root',
@@ -27,18 +27,18 @@ export class AppComponent implements OnInit {
   imageHeight: string = 'auto';
   imageDivOverflow: string = 'unset';
 
-  genericColors = {
-    strokeColor : 'rgba(55, 160, 102, 1)',
-    fillColor : 'rgba(137, 215, 182, 1)',
-    handlerFillColor : 'rgba(255, 255, 255, 1)',
-    handlerStrokeColor : 'rgba(0, 0, 0, 1)'
+  genericColors: Colors = {
+    strokeColor : 'rgba(91, 81, 255, 0.96)',
+    fillColor : 'rgba(96, 87, 254, 0.11)',
+    handlerFillColor : 'rgba(96, 87, 254, 0.11)',
+    handlerStrokeColor : 'rgba(91, 81, 255, 0.96)'
   }
 
   circleColors = {
-    strokeColor : 'rgba(222, 255, 0, 1)',
-    fillColor : 'rgba(255, 255, 0, 1)',
-    handlerFillColor : 'rgba(115, 47, 12, 1)',
-    handlerStrokeColor : 'rgba(0, 0, 0, 1)',
+    strokeColor : 'rgba(94, 179, 0, 1)',
+    fillColor : 'rgba(234, 255, 211, 1)',
+    handlerFillColor : 'rgba(94, 179, 0, 1)',
+    handlerStrokeColor : 'rgba(234, 255, 211, 1)',
   }
 
   constructor(private ngZone: NgZone) {
@@ -80,11 +80,6 @@ export class AppComponent implements OnInit {
         id: 16,
         ...this.circleColors
       },
-      // {
-      //   name: GenericPath.NAME,
-      //   points: [[70, 60], [80, 60], [90, 80], [60, 80]],
-      //   keepInsideContainer: true
-      // }
     ];
   }
 

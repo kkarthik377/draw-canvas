@@ -22,7 +22,7 @@ export abstract class BasePath extends BaseShape {
     protected strokeColor: string,
     protected handlerFillColor: string,
     protected handlerStrokeColor: string,
-    id: number,
+    public id: number,
     points: number[][],
     forcedAspectRatio: number,
     keepInsideContainer: boolean,
